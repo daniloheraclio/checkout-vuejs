@@ -1,0 +1,16 @@
+[
+    {  "id": 1,
+       "title": "Xbox One S 1Tb",
+       "price": 399,
+       "color": "white",
+       "img": "https://compass-ssl.xbox.com/assets/6d/e4/6de4737d-4370-44d1-b579-620206a3cf2f.jpg?n=X1S-2019_Panes-2-Up-1084_X1S_570x400.jpg",
+       "qtt": 1
+    },
+    {  "id": 2,
+       "title": "Xbox One Controller",
+       "price": 89,
+       "color": "white",
+       "img": "https://compass-ssl.xbox.com/assets/6d/e4/6de4737d-4370-44d1-b579-620206a3cf2f.jpg?n=X1S-2019_Panes-2-Up-1084_X1S_570x400.jpg",
+       "qtt": 1
+    }
+]
