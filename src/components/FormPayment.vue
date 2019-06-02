@@ -11,11 +11,6 @@ import FormCreditCard from './FormCreditCard'
 export default {
    name: 'FormPayment',
    components: { FormCreditCard },
-   methods: {
-      pay() {
-         console.log('works')
-      }
-   }
 }
 </script>
 

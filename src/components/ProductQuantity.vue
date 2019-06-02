@@ -15,11 +15,13 @@ export default {
   name: 'ProductQuantity',
   props: ['product'],
   methods: {
+    // Increment product quantity
     addProduct() {
       this.product.qtt++;
       this.$emit('update-qtt');
     },
     removeProduct() {
+      // Decrement product quantity and limit to have at least 1
       if(this.product.qtt > 1) {
         this.product.qtt--
         this.$emit('update-qtt');

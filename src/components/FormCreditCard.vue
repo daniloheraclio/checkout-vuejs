@@ -2,7 +2,7 @@
    <form @submit.prevent="pay">
       <div class="form-group">
          <label for="cardholder">Card Holder</label>
-         <input class="input-card-holder"
+         <input 
             type="text" 
             placeholder="John Doe"
             name="cardholder" 
@@ -11,9 +11,10 @@
         <span class="validation-error">{{ errors.first('cardholder') }}</span>
       </div>
 
-      <div class="form-group">
+      <div class="form-group card-flag">
          <label for="cardnumber">Card Number</label>
-         <input class="input-card-number"
+         <div class="card-type"></div>
+         <input
             type="text" 
             placeholder="4242 4242 4242 4242"
             name="cardnumber" 
@@ -54,43 +55,44 @@
 </template>
 <script>
 import { setTimeout } from 'timers'
-import {mask} from 'vue-the-mask'
+import { mask } from 'vue-the-mask'
 import { Validator } from 'vee-validate';
 
-Validator.extend('truthy', {
-  getMessage: field => 'Enter one valid expiricy date.',
-  validate: value => value = 'danilo'
-});
+let instance = new Validator();
 
-let instance = new Validator({ trueField: 'truthy' });
-
-// Also there is an instance 'extend' method for convenience.
 instance.extend('falsy', function(value) {
-   let inputYear = value.slice(-4);
-   let inputMonth = value.substring(0, 2);
 
-   let today = new Date();
-   // get four current year digits (yyyy)
-   let currentYear = today.getFullYear()
-   
-   // get two current month digits (mm) and increment 0 if is smaller then 10
-   let currentMonth = today.getMonth() + 1 // January is 0
-   if(currentMonth < 10) {
-      currentMonth = '0' + currentMonth;
-   }
+   //start validation checking the length of expiricy date
+   if(value.length == 7) {
 
-   if(inputYear < currentYear) {
-      return false
-   }
+      // get four inputed digits
+      let inputYear = value.slice(-4);
+      let inputMonth = value.substring(0, 2);
 
-   if(inputYear == currentYear && inputMonth <= currentMonth){
-      return false
-   }
+      let today = new Date();
+      // get four current year digits (yyyy)
+      let currentYear = today.getFullYear()
+      
+      // get two current month digits (mm) and increment 0 if is smaller then 10
+      let currentMonth = today.getMonth() + 1 // January is 0
+      if(currentMonth < 10) {
+         currentMonth = '0' + currentMonth;
+      }
 
-   if(inputYear == currentYear && inputMonth > currentMonth){
+      if(inputMonth > 12 || inputYear < currentYear) {
+         return false
+      }
+
+      if(inputYear == currentYear && inputMonth < currentMonth){
+         return false
+      }
+
+      if(inputYear == currentYear && inputMonth >= currentMonth){
+         return true
+      }
       return true
    }
-   return true
+   return false
 });
 
 instance.attach({
@@ -110,35 +112,29 @@ export default {
             holder: '',
             number: null,
             expiracyDate: '',
-            cvv: null
+            cvv: null,
+            flag: false
          },
       }
    },
    methods: {
     pay() {
-      //this.confirmation = true;
+      
       this.$validator.validate().then(valid => {
         if (!valid) {
-           console.log(valid);
-           console.log(typeof(this.card.expiracyDate));
+           
         } else {
-           setTimeout(() => {
-            // Use sweetalert2
-            this.$swal({
+           // Succes! Show alert
+           this.$swal({
                title: 'Thank you',
                text: 'FOR YOUR PURCHASE',
                type: 'success',
-               showLoaderOnConfirm: true,
                showCloseButton: true,
             });
-
-            // reset the values
+            // reset fields
             this.reset();
-           }, 500)
-            
-              
         }
-      });
+      })
     },
     
     reset() {
@@ -149,22 +145,13 @@ export default {
             date: '',
             cvv: ''
        }
-    }
+    },
   },
-  mounted(){
-   //   let today = new Date();
-   //   this.currentYear = today.getFullYear()
-     
-   //   let month = today.getMonth() + 1 // January is 0
-   //   if(month < 10) {
-   //      month = '0' + month;
-   //   }
-   //   this.currentMonth = month;
-  } 
 }
 </script>
 
 <style lang="less" scoped>
+@import "../assets/less/colors";
 @import "../assets/less/animation";
 
 form {
@@ -172,119 +159,92 @@ form {
    padding: 10px 50px;
    text-align: left;
    margin-bottom: 20px;
-}
 
-label {
-   display: block;
-   font-size: 0.7rem;
-   padding: 0 0 5px 5px;
-}
-.slash {
-   display: inline-block;
-   padding: 1px 0 6px;
-   background: #eee;
-   border-top: 2px solid #eee; 
-}
-.label-expiracy {
-   width: 175px;
-}
+   div.form-group {
+      margin-bottom: 12px;
+   }
 
-.form-group {
-   margin-bottom: 12px;
-}
-.col {
-   display: flex;
-   width: 450px;
-}
-.col-6 {
-   width: 40%;
-}
+   label {
+      display: block;
+      font-size: 0.75rem;
+      padding: 5px 5px;
+   }
 
-input {
-   padding: 7px 15px;
-   outline: none;
-   border-radius: 4px;
-   border: none;
-   background: #eee;
-   width: 100%;
-}
+   .col {
+      display: flex;
+      width: 450px;
+   }
+   .col-6 {
+      width: 40%;
+   }
 
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
-  -webkit-appearance: none; 
-  margin: 0; 
-}
+   input {
+      padding: 10px 25px;
+      outline: none;
+      border-radius: 4px;
+      border: none;
+      background: #eee;
+      width: 100%;
+   }
 
-.input-card-expiracy {
-   width: 65%;
-   border-radius: 4px;
-}
-.input-card-cvv {
-   display: block;
-   width: 35%;
-}
+   .card-flag {
+      position: relative;
+   }
+   /* Card type flag */
+   .card-type {
+      width: 32px;
+      height: 21px;
+      background: url("../assets/img/cards.png");
+      background-repeat: no-repeat;
+      position: absolute;
+      background-size: 30px;
+      background-position: 0 -109px;
+      top: 33px;
+      right: 8px;
+   }
 
-.btn-confirm {
-   padding: 7px 12px;
-   background: #6fea97;
-   border-radius: 4px;
-   color: #fff;
-   box-shadow: 0px 0px 8px 0px rgba(209,209,209,0.8);
-   float: right;
-   transition: 0.4s;
-}
+   input.input-card-cvv {
+      display: block;
+      width: 35%;
+      padding: 10px 15px;
+      text-align: center;
+   }
 
-.btn-confirm:hover {
-   background: #6fe095;
-}  
+   input.input-card-expiracy {
+      width: 65%;
+      border-radius: 4px;
+   }
 
-.validation-error {
-   display: block;
-   font-size: 0.7rem;
-   margin: 0;
-   padding-left: 5px;
-   color: red;
-}
-.is-valid {
-   color: #444
-}
+   .btn-confirm {
+      padding: 7px 12px;
+      background: @primary;
+      border-radius: 4px;
+      color: #fff;
+      box-shadow: 0px 0px 8px 0px rgba(209,209,209,0.8);
+      float: right;
+      transition: 0.4s;
+   }
 
- /* loader */
- .lds-dual-ring {
-  display: inline-block;
-  width: 15px;
-  height: 15px;
-}
-.lds-dual-ring:after {
-  content: " ";
-  display: inline-block;
-  width: 15px;
-  height: 15px;
-  margin: 1px;
-  border-radius: 50%;
-  border: 1px solid #fff;
-  border-color: #fff transparent #fff transparent;
-  animation: lds-dual-ring 1.2s linear infinite;
-}
-@keyframes lds-dual-ring {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
+   .btn-confirm:hover {
+      box-shadow: 5px 5px 18px 0px rgba(209,209,209,0.8);
+   }
 
-/* input filds animation alert */
-.is-invalid {
-	-webkit-animation: shake-horizontal 0.8s cubic-bezier(0.455, 0.030, 0.515, 0.955) both;
-	        animation: shake-horizontal 0.8s cubic-bezier(0.455, 0.030, 0.515, 0.955) both;
-}
+   .validation-error {
+      display: block;
+      font-size: 0.7rem;
+      margin: 0;
+      padding-left: 5px;
+      color: @error;
+   }
+   .is-valid {
+      color: @darkgrey;
+   }
 
-/* Sweet Alert */
-.swal2-header,
-.swal2-content {
-   font-family: sans-serif;
+   /* input filds animation alert */
+   .is-invalid {
+      -webkit-animation: shake-horizontal 0.8s cubic-bezier(0.455, 0.030, 0.515, 0.955) both;
+            animation: shake-horizontal 0.8s cubic-bezier(0.455, 0.030, 0.515, 0.955) both;
+   }
 }
 
 </style>

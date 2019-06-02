@@ -39,14 +39,9 @@ export default {
       }
    },
    methods: {
-      // updateQtt() {
-      //    this.order.subTotal = 0;
-
-      //    this.products.forEach(product => 
-      //       this.order.subTotal += product.qtt * product.price);
-         
-      // },
-      // Calculate subtotal
+      /**
+       * Each product has its price and quantity so when a product has been removes we refresh the subtotal
+       */
       subTotal() {
          this.order.subtotal = this.products
             .map(product => product.price * product.qtt)
